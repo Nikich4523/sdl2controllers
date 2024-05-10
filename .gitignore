@@ -1,0 +1,10 @@
+.clangd
+CMakeUserPresets.json
+out/
+
+# Executables
+sdl2controllers
+*.exe
+*.out
+*.app
+
