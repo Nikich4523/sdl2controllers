@@ -1,6 +1,7 @@
 #include "DummyWindow.h"
 
 #include <SDL2/SDL.h>
+#include <SDL2/SDL_video.h>
 
 base::DummyWindow::DummyWindow()
 {
@@ -14,5 +15,10 @@ base::DummyWindow::DummyWindow()
 	);
 
 	SDLWindowSurface = SDL_GetWindowSurface(SDLWindow);
+}
+
+base::DummyWindow::~DummyWindow()
+{
+	SDL_DestroyWindow(SDLWindow);
 }
 

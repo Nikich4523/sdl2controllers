@@ -13,12 +13,19 @@
 namespace getting_started
 {
 
+void shutdown(SDL_GameController *game_controller = nullptr)
+{
+	SDL_GameControllerClose(game_controller);
+	SDL_Quit();
+	exit(0);
+}
+
 void run()
 {
 	if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_GAMECONTROLLER))
 	{
 		std::cout << "SDL could not initialize! SDL Error: " << SDL_GetError() << "\n";
-		return;
+		shutdown();
 	}
 	std::cout << "SDL initialized\n";
 
@@ -36,7 +43,7 @@ void run()
 	if (!game_controller)
 	{
 		std::cout << "Controller did not find\n";
-		return;
+		shutdown();
 	}
 
 	base::DummyWindow app;
@@ -48,7 +55,7 @@ void run()
 		{
 			switch (event.type)
 			{
-			  case SDL_KEYDOWN: exit(0);
+			  case SDL_KEYDOWN: shutdown(game_controller);
 			}
 		}
 

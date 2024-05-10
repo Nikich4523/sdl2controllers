@@ -11,6 +11,7 @@ class DummyWindow
 {
 public:
 	DummyWindow();
+	~DummyWindow();
 private:
 	SDL_Window *SDLWindow{nullptr};
 	SDL_Surface *SDLWindowSurface{nullptr};
