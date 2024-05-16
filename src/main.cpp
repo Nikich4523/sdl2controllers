@@ -1,4 +1,5 @@
 #include "0_getting_started/getting_started.h"
+#include <1_rotate_arrow/RotateArrow.h>
 
 #include <iostream>
 #include <string>
@@ -16,6 +17,10 @@ int main(int argc, char* argv[])
 	if (example == "0")
 	{
 		getting_started::run();
+	}
+	else if (example == "1")
+	{
+		RotateArrow::run();
 	}
 	else {
 		std::cout << "Unknown example! Check src/ dir, please" << "\n";
