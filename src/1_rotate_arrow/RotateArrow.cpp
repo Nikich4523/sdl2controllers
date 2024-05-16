@@ -2,12 +2,16 @@
 
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_error.h>
+#include <SDL2/SDL_events.h>
 #include <SDL2/SDL_gamecontroller.h>
 #include <SDL2/SDL_image.h>
+#include <SDL2/SDL_joystick.h>
 #include <SDL2/SDL_render.h>
 #include <SDL2/SDL_surface.h>
 #include <SDL2/SDL_video.h>
 
+#include <cmath>
+#include <cstdlib>
 #include <iostream>
 
 
@@ -70,17 +74,71 @@ void RotateArrow::run()
 		return;
 	}
 
-	const Uint32 startMs = SDL_GetTicks();
-	const Uint32 durationMs{5000};
-    while(SDL_GetTicks() - startMs < durationMs)
+	const Uint32 start_ms = SDL_GetTicks();
+	const Uint32 duration_ms{2000};
+	const double rotation_speed{360.0 / duration_ms};
+	Uint32 elapsed_ms{0};
+    while(elapsed_ms < duration_ms)
     {
+		elapsed_ms = SDL_GetTicks() - start_ms;
         SDL_PumpEvents();
+
+		// 2.
         SDL_RenderClear(renderer);
-		SDL_RenderCopy(renderer, texture, nullptr, nullptr);
+		SDL_RenderCopyEx(renderer, texture, nullptr, nullptr, elapsed_ms * rotation_speed, nullptr, SDL_FLIP_NONE);
         SDL_RenderPresent(renderer);
     }
 
-	// rotate arrow via code
+	// 3. & 4.
+	SDL_GameController *gamecontroller{nullptr};
+	for (int i = 0, cnt = SDL_NumJoysticks(); i < cnt; ++i)
+	{
+		if (SDL_IsGameController(i))
+		{
+			gamecontroller = SDL_GameControllerOpen(i);
+		}
+	}
+
+	if (!gamecontroller)
+	{
+		std::cout << "Could not find game controller!\n";
+		return;
+	}
+
+	const int controller_deadzone_motion{8000};
+	double rotation_angle{0.0};
+
+	SDL_Event event;
+	while (true)
+	{
+		while (SDL_PollEvent(&event))
+		{
+			switch (event.type)
+			{
+				case SDL_QUIT: return;
+				case SDL_CONTROLLERAXISMOTION:
+				{
+					if (event.caxis.axis != SDL_GameControllerAxis::SDL_CONTROLLER_AXIS_RIGHTX)
+					{
+						break;
+					}
+
+					const int controller_motion = event.caxis.value;
+					if (std::abs(controller_motion) < controller_deadzone_motion)
+					{
+						break;
+					}
+
+					rotation_angle += copysign(rotation_speed, controller_motion);
+				}
+			}
+		}
+
+        SDL_RenderClear(renderer);
+		SDL_RenderCopyEx(renderer, texture, nullptr, nullptr, rotation_angle, nullptr, SDL_FLIP_NONE);
+        SDL_RenderPresent(renderer);
+	}
+
 	// rotate arrow via controller's stick
 	// rotate arrow via controller's triggers considering pressing force
 }
